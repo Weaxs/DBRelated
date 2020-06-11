@@ -112,8 +112,45 @@
     
 > 日志
     
-    
-    
+    redo log
+    这样我们在事务提交时，把上述内容刷新到磁盘中，即使之后系统崩溃了，重启之后只要按照上述内容所记录的步骤重新更新一下数据页，那么该事务对数据库中所做的修改又可以被恢复出来，也就意味着满足持久性的要求。因为在系统崩溃重启时需要按照上述内容所记录的步骤重新更新数据页，所以上述内容也被称之为重做日志，英文名为redo log。
+        redo日志占用的空间非常小
+        redo日志是顺序写入磁盘的, redo日志是顺序写入磁盘的
+
+    redo log日志通用结构:
+        type:           该条redo日志的类型
+        space ID:       表空间ID
+        page number:    页号
+        data:           该条redo日志的具体内容
+    redo log日志的内容会记录在redo log block(redo日志的页)中。
+    为了解决磁盘速度过慢的问题引入了Buffer Pool(redo日志缓冲区)，在服务器启动时就向操作系统申请一大片称为redo log buffer(redo日志缓冲区)的连续内存空间，空间被划分成若干个连续的redo log block。
+
+    redo日志的刷盘时机
+    1.log buffer空间不足时
+        设计InnoDB时规定，当log buffer的redo日志量已经占满log buffer总量的大约一半左右，就需要把这些日志刷到磁盘上。
+    2.事务提交时
+        事务提交时可以不把修改过的Buffer Pool页面刷新到磁盘，但是为了保持持久性，必须要把修改这些页面对应的redo日志刷新到磁盘
+    3.后台线程定时刷盘
+        后台有一个线程，大约每秒刷新一次log buffer中的redo日志到磁盘
+    4.正常关闭服务器时
+
+    undo log
+    为了回滚而记录。为了实现事务的原子性，InnoDB存储引擎在实际进行增、删、改一条记录时，都需要先把对应的undo日志记下来。
+    你插入一条记录时，至少要把这条记录的主键值记下来，之后回滚的时候只需要把这个主键值对应的记录删掉就好了。
+    你删除了一条记录，至少要把这条记录中的内容都记下来，这样之后回滚时再把由这些内容组成的记录插入到表中就好了。
+    你修改了一条记录，至少要把修改这条记录前的旧值都记录下来，这样之后回滚时再把这条记录更新为旧值就好了。
+    undo log分为两大类: TRX_UNDO_INSERT_REC   TRX_UNDO_DEL_MARK_REC/TRX_UNDO_UPD_EXIST_REC
+    类型为TRX_UNDO_INSERT_REC的undo日志在事务提交后可以直接删除掉，而其他类型的undo日志还需要为所谓的MVCC服务，不能直接删除掉，对它们的处理需要区别对待。
+    undo log也有页的概念，但是同一个Undo页面要么只存储TRX_UNDO_INSERT大类的undo日志，要么只存储TRX_UNDO_UPDATE大类的undo日志，所以在一个事务执行过程中就可能需要2个Undo页面的链表，一个称之为insert undo链表，另一个称之为update undo链表。
+
+    binlog
+    binlog的三种格式:
+        STATMENT模式 基于SQL语句的复制(statement-based replication, SBR): 
+            每一条会修改数据的sql语句会记录到binlog中。(准确性差，系统函数不能准确复制)
+        基于行的复制(row-based replication, RBR): 
+            不记录每一条SQL语句的上下文信息，仅需记录哪条数据被修改了，修改成了什么样子了。(日志文件大)
+        混合模式复制(mixed-based replication, MBR): 
+            一般的复制使用STATEMENT模式保存binlog，对于STATEMENT模式无法复制的操作使用ROW模式保存binlog，MySQL会根据执行的SQL语句选择日志保存方式。(有可能主从不一致)
     
 > 分库分表
     

@@ -1,5 +1,7 @@
 > # Redis命令参数
 
+    只有String类型可以在添加的时候直接设置过期时间,其他类型都需要通过EXPIRE key seconds/EXPIREAT key timestamp命令设置过期时间
+
 > String
 
     SET命令

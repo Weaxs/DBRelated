@@ -26,6 +26,8 @@ set session transaction isolation level repeatable read ;
 
 # start transaction ;
 begin ;
+# repeatable read ReadView1  |  read committed ReadView1
 select field from transaction_test_dbt where  id in (1,2);
+# repeatable read ReadView1  |  read committed ReadView2
 select field from transaction_test_db where  id in (1,2);
 commit ;

@@ -89,8 +89,13 @@
         当我们在对使用InnoDB存储引擎的表的某些记录加X锁之前，那就需要先在表级别加一个IX锁。
         IS锁和IX锁的使命只是为了后续在加表级别的S锁和X锁时判断表中是否有已经被加锁的记录，以避免用遍历的方式来查看表中有没有上锁的记录。
      2.表级别的AUTO-INC锁
-     A  UTO-INC锁的作用范围只是单个插入语句，插入语句完成锁被释放，而非一个事务
+        AUTO-INC锁的作用范围只是单个插入语句，插入语句完成锁被释放，而非一个事务
         一个事务在持有AUTO-INC锁的过程中，其他事务的插入语句都要被阻塞，可以保证一个语句中分配的递增值是连续的。
+     3.表级别的MDL锁
+        Metadata Lock(元数据锁) server层
+        只有在事务(select update delete insert)结束后才会释放Metadata lock，因此在事务提交或回滚前，是无法进行DDL(drop rename alter create)操作的。
+        MDL出现的初衷就是为了保护一个处于事务中的表的结构不被修改。MDL是事务级别的，只有在事务结束后才会释放。
+        对某个表执行一些诸如ALTER TABLE、DROP TABLE这类的DDL语句时，其他事务对这个表并发执行诸如SELECT、INSERT、DELETE、UPDATE的语句会发生阻塞，同理，某个事务中对某个表执行SELECT、         INSERT、DELETE、UPDATE语句时，在其他会话中对这个表执行DDL语句也会发生阻塞。
         
         
         

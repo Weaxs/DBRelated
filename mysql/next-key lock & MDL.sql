@@ -68,7 +68,7 @@ begin;
 select * from example;
 #commit;
 #console_2
-alter table example alter column text set default 'default'; # 堵塞
-begin; # 堵塞
-select * from example; # 堵塞
-commit; # 堵塞
+alter table example alter column text set default 'default';     # blocked & waiting 
+begin;                                                           # blocked & waiting 
+select * from example;                                           # blocked & waiting 
+commit;                                                          # blocked & waiting 

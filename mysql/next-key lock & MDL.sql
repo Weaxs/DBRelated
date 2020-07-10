@@ -1,4 +1,4 @@
-# next-key lock两个“原则”、两个“优化”和一个“bug”。
+## next-key lock两个“原则”、两个“优化”和一个“bug”。
 # 1.原则 1：加锁的基本单位是 next-key lock。前开后闭区间。
 # 2.原则 2：查找过程中访问到的对象才会加锁。
 # 3.优化 1：索引上的等值查询，给唯一索引加锁的时候，next-key lock 退化为行锁。
@@ -56,9 +56,18 @@ insert into example value (13,13,'十三');         # blocked & waiting
 # console_3
 update example set text='十五一' where id = 15;   # blocked & waiting
 # 根据原则1，加锁(5,10]，根据优化1，id=10退化成行锁;根据范围查询，继续往后到id=15，因此加锁(10,15]，因为非等值查询，所以不走优化  加锁范围[10,15]
+                                                         
 
 
-
-
-
-
+                                                         
+                                                         
+## metadata lock
+#console_1
+begin;
+select * from example;
+#commit;
+#console_2
+alter table example alter column text set default 'default'; # 堵塞
+begin; # 堵塞
+select * from example; # 堵塞
+commit; # 堵塞

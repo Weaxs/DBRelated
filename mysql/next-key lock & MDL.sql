@@ -60,6 +60,7 @@ update example set text='十五一' where id = 15;   # blocked & waiting
 
 
                                                          
+      
                                                          
 ## metadata lock
 #console_1

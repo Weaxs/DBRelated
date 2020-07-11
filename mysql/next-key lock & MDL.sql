@@ -43,7 +43,7 @@ insert into example value (7,7,'柒');                # blocked & waiting
 insert into example value (3,3,'三');                # blocked & waiting
 update example set text = '五五' where value = 5;    # blocked & waiting      被锁个人认为：先通过value=5的辅助索引+聚合索引获取记录位置(此时不加锁)，然后尝试获取路径上的X锁时被阻塞
 update example set text = '五五' where value > 4 and value < 15;      # blocked & waiting
-# 根据原则1，next-key lock加锁范围为(0,5];因为value是普通索引，需要向右便利，查到value=10。根据原则2+优化2，加锁范围为(5,10)  加锁范围(0,10)
+# 根据原则1，next-key lock加锁范围为(0,5];因为value是普通索引，需要向右遍历，查到value=10。根据原则2+优化2，加锁范围为(5,10)  加锁范围(0,10)
 # lock in share mode 在索引覆盖的情况下，只锁辅助索引B+树;for update 时，系统会认为你接下来要更新数据，因此会顺便给主键索引上满足条件的行加上行锁，即锁辅助索引和聚合索引的B+树
 # lock in share mode 来给行加读锁避免数据被更新的话，就必须得绕过覆盖索引的优化，在查询字段中加入索引中不存在的字段
 # 锁是在加在索引上的

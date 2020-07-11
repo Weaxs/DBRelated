@@ -8,9 +8,11 @@
 
 create table example
 (
-    id    int not_null primary key,
+    id    int not null ,
     value int         null,
-    text  varchar(10) null
+    text  varchar(10) null,
+    constraint example_pk
+		primary key (id)
 );
 create index example_value_index on example (value);
 insert into example values(0,0,'零'),(5,5,'五'),(10,10,'十'),(15,15,'十五'),(20,20,'二十'),(25,25,'二五');

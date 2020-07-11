@@ -6,13 +6,13 @@
 # 5.一个 bug：唯一索引上的范围查询会访问到不满足条件的第一个值为止。
 # 共享锁：lock in shrae mode    排他锁：for update
 
-create table cpu_pubapp.example
+create table example
 (
     id    int not_null primary key,
     value int         null,
     text  varchar(10) null
 );
-create index example_value_index on cpu_pubapp.example (value);
+create index example_value_index on example (value);
 insert into example values(0,0,'零'),(5,5,'五'),(10,10,'十'),(15,15,'十五'),(20,20,'二十'),(25,25,'二五');
 # 间隙(id)：(-∞ - 0),(0 - 5),(5 - 10),(10 - 15),(15 - 20),(20 - 25),(25 - ∞)
 # 间隙(value)：(-∞ - 0),(0 - 5),(5 - 10),(10 - 15),(15 - 20),(20 - 25),(25 - ∞)

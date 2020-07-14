@@ -38,13 +38,14 @@ select id from example where value = 5 lock in share mode; # 覆盖索引 (查�
 # console_2
 update example set text = '柒' where value = 7;      # OK    未被加锁个人认为：先通过value=7的辅助索引树+聚合索引获取该条记录的位置select(因为是读锁所以未锁)，查不出来数据所以没加锁
 update example set text = '五五' where id = 5;       # OK    读锁在索引覆盖情况下，只给辅助索引B+树加锁
-update example set value = 6 where value = 4;        # OK
-update example set text = '五五' where value > 4;    # OK
+update example set value = 6 where value = 4;        # OK	 同没数据
+update example set text = '五五' where value > 4;    # OK	   未被锁上个人认为：先通过value>4在聚合索引上查出数据(不会上锁)，然后改写聚合索引叶子节点的数据，写操作的时候不会被非聚集索引阻塞		
 # console_3
 insert into example value (7,7,'柒');                # blocked & waiting    
 insert into example value (3,3,'三');                # blocked & waiting
 update example set text = '五五' where value = 5;    # blocked & waiting      被锁个人认为：先通过value=5的辅助索引+聚合索引获取记录位置(此时不加锁)，然后尝试获取路径上的X锁时被阻塞
 update example set text = '五五' where value > 4 and value < 15;      # blocked & waiting
+update example set value = 888 where value > 4;	     # blocked & waiting 	  和上面的对比，被锁是因为需要对value索引树的节点进行删除新增的操作，此时会被锁阻塞
 # 根据原则1，next-key lock加锁范围为(0,5];因为value是普通索引，需要向右遍历，查到value=10。根据原则2+优化2，加锁范围为(5,10)  加锁范围(0,10)
 # lock in share mode 在索引覆盖的情况下，只锁辅助索引B+树;for update 时，系统会认为你接下来要更新数据，因此会顺便给主键索引上满足条件的行加上行锁，即锁辅助索引和聚合索引的B+树
 # lock in share mode 来给行加读锁避免数据被更新的话，就必须得绕过覆盖索引的优化，在查询字段中加入索引中不存在的字段

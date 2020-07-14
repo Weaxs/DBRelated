@@ -40,6 +40,7 @@ update example set text = '柒' where value = 7;      # OK    未被加锁个人
 update example set text = '五五' where id = 5;       # OK    读锁在索引覆盖情况下，只给辅助索引B+树加锁
 update example set value = 6 where value = 4;        # OK	 同没数据
 update example set text = '五五' where value > 4;    # OK	   未被锁上个人认为：先通过value>4在聚合索引上查出数据(不会上锁)，然后改写聚合索引叶子节点的数据，写操作的时候不会被非聚集索引阻塞		
+update example set value = 888 where value > 5;		 # OK	 证明了上锁的是(0,10)，因为(5,10)上没有节点所以更新不会冲突
 # console_3
 insert into example value (7,7,'柒');                # blocked & waiting    
 insert into example value (3,3,'三');                # blocked & waiting

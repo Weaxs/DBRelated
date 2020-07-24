@@ -22,7 +22,7 @@
     SERIALIZABLE(可串行化):最高的隔离级别，完全服从ACID的隔离级别。所有的事务依次逐个执行，这样事务之间就完全不可能产生干扰，也就是说，该级别可以防止脏读、不可重复读以及幻读。
     
     MySQL InnoDB存储引擎的默认支持的隔离级别是REPEATABLE-READ(可重读)
-    与SQL标准不同的地方在于 InnoDB存储引擎在REPEATABLE-READ(可重读)事务隔离级别下使用的是Next-Key Lock锁算法，因此可以避免幻读的产生
+    与SQL标准不同的地方在于 InnoDB存储引擎在REPEATABLE-READ(可重读)事务隔离级别下使用的是Next-Key Lock锁 + MVCC算法，因此可以避免幻读的产生
     
 > 锁机制 与 InnoDB锁
 

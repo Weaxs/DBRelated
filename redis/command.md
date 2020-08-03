@@ -1,4 +1,4 @@
- # Redis命令参数
+# Redis命令参数
 
 只有String类型可以在添加的时候直接设置过期时间,其他类型都需要通过EXPIRE key seconds/EXPIREAT key timestamp命令设置过期时间
 
@@ -8,7 +8,8 @@ SET命令
     
     参数:
     EX seconds      将键的过期时间设置为seconds秒。 执行SET key value EX seconds的效果等同于执行SETEX key seconds value。
-    PX milliseconds 将键的过期时间设置为 milliseconds 毫秒。 执行SET key value PX milliseconds的效果等同于执行PSETEX key milliseconds value。
+    PX milliseconds 将键的过期时间设置为 milliseconds 毫秒。 
+                    执行SET key value PX milliseconds的效果等同于执行PSETEX key milliseconds value。
     NX              只在键不存在时，才对键进行设置操作。 执行SET key value NX 的效果等同于执行 SETNX key value。
     XX              只在键已经存在时，才对键进行设置操作。
     代码示例:
